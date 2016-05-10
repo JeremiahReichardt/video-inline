@@ -1,0 +1,21 @@
+{
+  "name": "video-inline",
+  "authors": [
+    "Jeremiah Reichardt <jeremiah.reichardt@byhook.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "iron-component-page": "^1.1.6"
+  }
+}
