@@ -25,14 +25,12 @@ Example:
                poster="{{poster}}"
                preload="{{preload}}"
                src="{{src}}"
-               width="width">
+               width={{width}}>
         </video>
         <canvas></canvas>
     </template>
     <script>
         Polymer({
-            is: 'video-inline',
-
             ready: function(){
                 var v = this.$$('video');
 
@@ -126,263 +124,49 @@ Example:
             },
 
             properties:{
-                /**Returns an AudioTrackList object representing available audio tracks*/
-                audioTracks:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').audioTracks;
-                    },
-                    readOnly:true
-                },
 
-                /**Sets or returns whether the audio/video should start playing as soon as it is loaded*/
+                /**Specifies that the video will start playing as soon as it is ready*/
                 autoplay:{
-                    type:Boolean,
-                    value:function(){
-                        return this.$$('video').autoplay;
-                    },
-                    notify:true
+                    type:Boolean
                 },
 
-                /**Returns a TimeRanges object representing the buffered parts of the audio/video*/
-                buffered:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').buffered;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns the MediaController object representing the current media controller of the audio/video*/
-                controller:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').controller;
-                    },
-                    readOnly:true
-                },
-
-                /**Sets or returns whether the audio/video should display controls (like play/pause etc.)*/
+                /**Specifies that video controls should be displayed (such as a play/pause button etc).*/
                 controls:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').controls;
-                    },
-                    notify:true
+                    type:Boolean
                 },
 
-                /**Sets or returns the CORS settings of the audio/video*/
-                crossOrigin:{
-                    value:function(){
-                        return this.$$('video').crossOrigin;
-                    },
-                    notify:true
+                /**Sets the height of the video player*/
+                height:{
+                    type:Number
                 },
 
-                /**Returns the URL of the current audio/video*/
-                currentSrc:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').currentSrc;
-                    },
-                    readOnly:true
-                },
-
-                /**Sets or returns the current playback position in the audio/video (in seconds)*/
-                currentTime:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').currentTime;
-                    },
-                    notify:true
-                },
-
-                /**Sets or returns whether the audio/video should be muted by default*/
-                defaultMuted:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').defaultMuted;
-                    },
-                    notify:true
-                },
-
-                /**Sets or returns the default speed of the audio/video playback*/
-                defaultPlaybackRate:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').defaultPlaybackRate;
-                    },
-                    notify:true
-                },
-
-                /**Returns the length of the current audio/video (in seconds)*/
-                duration:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').duration;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns whether the playback of the audio/video has ended or not*/
-                ended:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').ended;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns a MediaError object representing the error state of the audio/video*/
-                error:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').error;
-                    },
-                    readOnly:true
-                },
-
-                /**Sets or returns whether the audio/video should start over again when finished*/
+                /**Specifies that the video will start over again, every time it is finished*/
                 loop:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').loop;
-                    },
-                    notify:true
+                    type:Boolean
                 },
 
-                /**Sets or returns the group the audio/video belongs to (used to link multiple audio/video elements)*/
-                mediaGroup:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').mediaGroup;
-                    },
-                    notify:true
-                },
-
-                /**Sets or returns whether the audio/video is muted or not*/
+                /**Specifies that the audio output of the video should be muted*/
                 muted:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').muted;
-                    },
-                    notify:true
+                    type:Boolean
                 },
 
-                /**Returns the current network state of the audio/video*/
-                networkState:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').networkState;
-                    },
-                    readOnly:true
+                /**Specifies an image to be shown while the video is downloading, or until the user hits the play button*/
+                poster:{
+                    type:String
                 },
 
-                /**Returns whether the audio/video is paused or not*/
-                paused:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').paused;
-                    }
-                },
-
-                /**Sets or returns the speed of the audio/video playback*/
-                playbackRate:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').playbackRate;
-                    },
-                    notify:true
-                },
-
-                /**Returns a TimeRanges object representing the played parts of the audio/video*/
-                played:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').played;
-                    },
-                    readOnly:true
-                },
-
-                /**Sets or returns whether the audio/video should be loaded when the page loads*/
+                /**Specifies if and how the author thinks the video should be loaded when the page loads
+                 * 'auto'
+                 * 'metadata'
+                 * 'none'
+                 * */
                 preload:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').preload;
-                    },
-                    notify:true
+                    type:String
                 },
 
-                /**Returns the current ready state of the audio/video*/
-                readyState:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').readyState;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns a TimeRanges object representing the seekable parts of the audio/video*/
-                seekable:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').seekable;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns whether the user is currently seeking in the audio/video*/
-                seeking:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').seeking;
-                    },
-                    readOnly:true
-                },
-
-                /**Sets or returns the current source of the audio/video element*/
-                src:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').src;
-                    },
-                    notify:true
-                },
-
-                /**Returns a Date object representing the current time offset*/
-                startDate:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').startDate;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns a TextTrackList object representing the available text tracks*/
-                textTracks:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').textTracks;
-                    },
-                    readOnly:true
-                },
-
-                /**Returns a VideoTrackList object representing the available video tracks*/
-                videoTracks:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').videoTracks;
-                    },
-                    readOnly:true
-                },
-
-                /**Sets or returns the volume of the audio/video*/
-                volume:{
-                    type:Object,
-                    value:function(){
-                        return this.$$('video').volume;
-                    },
-                    notify:true
+                /** Sets the width of the video player */
+                width:{
+                    type:String
                 }
             },
 
