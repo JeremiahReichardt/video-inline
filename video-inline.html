@@ -25,12 +25,14 @@ Example:
                poster="{{poster}}"
                preload="{{preload}}"
                src="{{src}}"
-               width={{width}}>
+               width="width">
         </video>
         <canvas></canvas>
     </template>
     <script>
         Polymer({
+            is: 'video-inline',
+
             ready: function(){
                 var v = this.$$('video');
 
