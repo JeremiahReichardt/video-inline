@@ -19,36 +19,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style>
 
         html, body{
-            margin: 0;
             font-family: 'Roboto', 'Noto', sans-serif;
-            height: 100%;
             max-height: 100%;
+            height: 100%;
+            margin: 0;
         }
 
         video-inline{
             display: inline-block;
-            width: 642px;
-            height: 362px;
         }
 
         video{
-            border: 1px solid black;
-            display:inline-block;
             vertical-align:top;
         }
 
         .output{
             border: 1px solid black;
-            min-width: 300px;
-            height: 100%;
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 300px;
             display:inline-block;
             vertical-align:top;
-            box-sizing: border-box;
-            margin-bottom: 10px;
+            overflow: auto;
+            max-height: 100%;
+            height: 100%;
         }
 
         .content{
-            height: 100%;
             overflow-y:auto;
         }
 
@@ -77,25 +74,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </div>
 
 <div class="output">
-    <div class="content" id="props-output"></div>
+    <div class="content" id="attributes-output"></div>
 </div>
 
-<div class="button">Reload Properties</div>
+<div class="output">
+    <div class="content" id="properties-output"></div>
+</div>
 
 <script>
     window.addEventListener('WebComponentsReady', function(e) {
         var videoInline = document.querySelector('video-inline');
+
         var eventsOutput = document.querySelector('#events-output');
-        var propsOutput = document.querySelector('#props-output');
+        var attributesOutput = document.querySelector('#attributes-output');
+        var propertiesOutput = document.querySelector('#properties-output');
+
         var functionEvent = function(event){
             eventsOutput.innerHTML = '<p>' + event.type + '</p>' + eventsOutput.innerHTML;
         };
-        var functionProps = function(prop){
-            if(prop==='clear'){
-                propsOutput.innerHTML = '';
-            }else{
-                propsOutput.innerHTML = '<p>' + prop + '</p>' + propsOutput.innerHTML;
-            }
+
+        var functionAttribute = function(attribute){
+            attributesOutput.innerHTML = '<p>' + attribute + '</p>' + attributesOutput.innerHTML;
+        };
+
+        var functionProperty = function(property){
+            propertiesOutput.innerHTML = '<p>' + property + '</p>' + propertiesOutput.innerHTML;
         };
 
         videoInline.onabort = functionEvent;
@@ -121,20 +124,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         videoInline.onvolumechange = functionEvent;
         videoInline.onwaiting = functionEvent;
 
-        function showProps(){
-            functionProps('clear');
-            functionProps(videoInline.autoplay);
-            functionProps(videoInline.controls);
-            functionProps(videoInline.height);
-            functionProps(videoInline.loop);
-            functionProps(videoInline.muted);
-            functionProps(videoInline.poster);
-        }
+        functionAttribute('autoplay ' + videoInline.autoplay);
+        functionAttribute('controls ' + videoInline.controls);
+        functionAttribute('height ' + videoInline.height);
+        functionAttribute('loop ' + videoInline.loop);
+        functionAttribute('muted ' + videoInline.muted);
+        functionAttribute('poster ' + videoInline.poster);
 
-        document.querySelector('.button').onclick = showProps;
+        functionProperty('currentTime ' + videoInline.currentTime);
 
-        showProps();
-        window.setTimeout( showProps, 1000 );
+        functionProperty('currentTime ' + videoInline.currentTime);
     });
 
 </script>
