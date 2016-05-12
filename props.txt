@@ -1,0 +1,29 @@
+* audioTracks  NOT SUPPORTED
+* autoplay
+* buffered
+* controller  NOT SUPPORTED
+* controls
+* crossOrigin  NOT SUPPORTED
+* currentSrc
+* currentTime
+* defaultMuted
+* defaultPlaybackRate
+* duration
+* ended
+* error NOT SUPPORTED
+* loop
+* mediaGroup
+* muted
+* networkState
+* paused
+* playbackRate
+* played
+* preload
+* readyState
+* seekable
+* seeking
+* src
+* startDate  NOT SUPPORTED
+* textTracks
+* videoTracks  NOT SUPPORTED
+* volume [this can be set on the video and not reflected in the video-inline object via a right click]

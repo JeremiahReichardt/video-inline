@@ -1,13 +1,4 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
 <head>
     <meta charset="utf-8">
@@ -67,7 +58,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 </head>
 <body>
-<video-inline src="big_buck_bunny.mp4" autoplay controls height="300" loop muted poster="poster.jpg"></video-inline>
+<video-inline src="big_buck_bunny.mp4" autoplay controls width="300" height="300" loop="1" muted poster="poster.jpg"></video-inline>
 
 <div class="output">
     <div class="content" id="events-output"></div>
@@ -94,11 +85,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
 
         var functionAttribute = function(attribute){
-            attributesOutput.innerHTML = '<p>' + attribute + '</p>' + attributesOutput.innerHTML;
+            if(attribute==="clear"){
+                attributesOutput.innerHTML = '';
+            }else{
+                attributesOutput.innerHTML = '<p>' + attribute + '</p>' + attributesOutput.innerHTML;
+            }
         };
 
         var functionProperty = function(property){
-            propertiesOutput.innerHTML = '<p>' + property + '</p>' + propertiesOutput.innerHTML;
+            if(property==="clear"){
+                propertiesOutput.innerHTML = '';
+            }else{
+                propertiesOutput.innerHTML = '<p>' + property + '</p>' + propertiesOutput.innerHTML;
+            }
         };
 
         videoInline.onabort = functionEvent;
@@ -124,16 +123,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         videoInline.onvolumechange = functionEvent;
         videoInline.onwaiting = functionEvent;
 
-        functionAttribute('autoplay ' + videoInline.autoplay);
-        functionAttribute('controls ' + videoInline.controls);
-        functionAttribute('height ' + videoInline.height);
-        functionAttribute('loop ' + videoInline.loop);
-        functionAttribute('muted ' + videoInline.muted);
-        functionAttribute('poster ' + videoInline.poster);
+        setInterval( function(){
 
-        functionProperty('currentTime ' + videoInline.currentTime);
+            functionAttribute('clear');
+            functionAttribute('autoplay ' + videoInline.autoplay);
+            functionAttribute('controls ' + videoInline.controls);
+            functionAttribute('height ' + videoInline.height);
+            functionAttribute('loop ' + videoInline.loop);
+            functionAttribute('muted ' + videoInline.muted);
+            functionAttribute('poster ' + videoInline.poster);
+            functionAttribute('preload ' + videoInline.preload);
 
-        functionProperty('currentTime ' + videoInline.currentTime);
+            functionProperty('clear');
+            functionProperty('autoplay ' + videoInline.autoplay );
+            functionProperty('controls ' + videoInline.controls );
+            functionProperty('currentSrc ' + videoInline.currentSrc );
+            functionProperty('currentTime ' + videoInline.currentTime );
+            functionProperty('duration ' + videoInline.duration );
+            functionProperty('loop ' + videoInline.loop );
+            functionProperty('muted ' + videoInline.muted );
+            functionProperty('src ' + videoInline.src );
+            functionProperty('paused ' + videoInline.paused );
+            functionProperty('volume ' + videoInline.volume );
+            functionProperty('buffered ' + videoInline.buffered );
+            functionProperty('ended ' + videoInline.ended );
+            functionProperty('played ' + videoInline.played );
+            functionProperty('seekable ' + videoInline.seekable );
+            functionProperty('textTracks ' + videoInline.textTracks );
+            functionProperty('mediaGroup ' + videoInline.mediaGroup );
+            functionProperty('networkState ' + videoInline.networkState );
+            functionProperty('playbackRate ' + videoInline.playbackRate );
+            functionProperty('readyState ' + videoInline.readyState );
+            functionProperty('defaultPlaybackRate ' + videoInline.defaultPlaybackRate );
+
+            if( videoInline.currentTime > 5 ){
+                videoInline.preload = 'metadata';
+            }
+
+        }, 100 );
+
     });
 
 </script>

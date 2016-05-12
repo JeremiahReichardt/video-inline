@@ -3,7 +3,33 @@
 and autoplay video on mobile/iOS, rather than going full screen and no autoplay.
 
 Example:
-    `<video is="video-inline" autoplay="true" src="foo.webm"></video>`
+    `<video-inline poster="poster.jpg" autoplay="true" loop="1" controls height="300" width="550" src="foo.mp4" muted></video>`
+
+Events:
+    <ul>
+    <li>onabort</li>
+    <li>oncanplay</li>
+    <li>oncanplaythrough</li>
+    <li>ondurationchange</li>
+    <li>onemptied</li>
+    <li>onended</li>
+    <li>onerror</li>
+    <li>onloadeddata</li>
+    <li>onloadedmetadata</li>
+    <li>onloadstart</li>
+    <li>onpause</li>
+    <li>onplay</li>
+    <li>onplaying</li>
+    <li>onprogress</li>
+    <li>onratechange</li>
+    <li>onseeked</li>
+    <li>onseeking</li>
+    <li>onstalled</li>
+    <li>onsuspend</li>
+    <li>ontimeupdate</li>
+    <li>onvolumechange</li>
+    <li>onwaiting</li>
+    </ul>
 
 @element video-inline
 @demo demo/index.html
@@ -25,7 +51,9 @@ Example:
                poster="{{poster}}"
                preload="{{preload}}"
                src="{{src}}"
-               width="width">
+               width="{{width}}"
+               current-time="{{currentTime::timeupdate}}"
+        >
         </video>
         <canvas></canvas>
     </template>
@@ -33,22 +61,11 @@ Example:
         Polymer({
             is: 'video-inline',
 
-            currentTime:-1,
-
-            _updateCurrentTime:function(){
-                this.currentTime = this.$$('video').currentTime;
-            },
-
-            listeners: {
-                'video.timeupdate' : '_updateCurrentTime'
-            },
-
             ready: function(){
                 var v = this.$$('video');
 
-                console.log( v );
-
                 v.onabort = function(){
+                    this._setNetworkState(this.$$('video').networkState);
                     this.fire('abort');
                 }.bind(this);
 
@@ -60,7 +77,8 @@ Example:
                     this.fire('canplaythrough');
                 }.bind(this);
 
-                v.ondurationchange = function(){
+                v.ondurationchange = function(e){
+                    this._setDuration(this.$$('video').duration);
                     this.fire('durationchange');
                 }.bind(this);
 
@@ -69,18 +87,30 @@ Example:
                 }.bind(this);
 
                 v.onended = function(){
+                    this._setEnded(true);
                     this.fire('ended');
                 }.bind(this);
 
-                v.onerror = function(){
+                v.onerror = function(e){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setNetworkState(this.$$('video').networkState);
                     this.fire('error');
                 }.bind(this);
 
                 v.onloadeddata = function(){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setNetworkState(this.$$('video').networkState);
+                    this.muted = v.muted;
+                    this.volume = v.volume;
                     this.fire('loadeddata');
                 }.bind(this);
 
                 v.onloadedmetadata = function(){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setNetworkState(this.$$('video').networkState);
+                    this._setTextTracks(this.$$('video').textTracks);
+                    this._setDuration(this.$$('video').duration);
+                    this._setCurrentSrc(this.$$('video').currentSrc);
                     this.fire('loadedmetadata');
                 }.bind(this);
 
@@ -89,6 +119,7 @@ Example:
                 }.bind(this);
 
                 v.onpause = function(){
+                    this._setPaused(true);
                     this.fire('pause');
                 }.bind(this);
 
@@ -101,86 +132,260 @@ Example:
                 }.bind(this);
 
                 v.onprogress = function(){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setEnded(false);
+                    this._setPaused(false);
+                    this._setBuffered(v.buffered);
+                    this._setPlayed(v.played);
+                    this._setSeekable(v.seekable);
                     this.fire('progress');
                 }.bind(this);
 
                 v.onratechange = function(){
+                    // unsure if this is needed because you can set the property which sets the videos property and this fires.
+                    // here for testing in IE which has a right click menu to change this ... unsure why its even an option.
+                    this.playbackRate = v.playbackRate;
                     this.fire('ratechange');
                 }.bind(this);
 
                 v.onseeked = function(){
+                    this._setSeeking(false);
                     this.fire('seeked');
                 }.bind(this);
 
                 v.onseeking = function(){
+                    this._setSeeking(true);
                     this.fire('seeking');
                 }.bind(this);
 
                 v.onstalled = function(){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setNetworkState(this.$$('video').networkState);
                     this.fire('stalled');
                 }.bind(this);
 
                 v.onsuspend = function(){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setNetworkState(this.$$('video').networkState);
                     this.fire('suspend');
                 }.bind(this);
 
                 v.ontimeupdate = function(){
+                    // I could not get v.onended to fire
+                    if( v.currentTime > 0 ) {
+                        this._setEnded(Math.round(v.currentTime) === Math.round(v.duration));
+                    }
                     this.fire('timeupdate');
                 }.bind(this);
 
                 v.onvolumechange = function(){
+                    this.muted = v.muted;
+                    this.volume = v.volume;
                     this.fire('volumechange');
                 }.bind(this);
 
                 v.onwaiting = function(){
+                    this._setReadyState(this.$$('video').readyState);
+                    this._setNetworkState(this.$$('video').networkState);
                     this.fire('waiting');
                 }.bind(this);
             },
 
             properties:{
-
                 /**Specifies that the video will start playing as soon as it is ready*/
                 autoplay:{
-                    type:Boolean
+                    type: Boolean,
+                    value: true
+                    // no observer needed
+                },
+
+                /**Represents the buffered parts of the audio/video.*/
+                buffered:{
+                    type: Object,
+                    value: {},
+                    readOnly: true
                 },
 
                 /**Specifies that video controls should be displayed (such as a play/pause button etc).*/
                 controls:{
-                    type:Boolean
+                    type: Boolean,
+                    value: false
+                    // no observer needed
+                },
+
+                currentSrc:{
+                    type: String,
+                    value: "",
+                    readOnly: true
+                },
+
+                currentTime:{
+                    type: Number,
+                    value: 0
+                    // no observer needed
+                },
+
+                defaultMuted:{
+                    type: Boolean,
+                    value: false,
+                    observer: '_changedDefaultMuted'
+                },
+
+                defaultPlaybackRate:{
+                    type: Number,
+                    value: 1.0,
+                    observer: '_changedDefaultPlaybackRate'
+                },
+
+                duration:{
+                    type: Number,
+                    value: 0,
+                    readOnly: true
+                },
+
+                /**A Boolean, returns true if the playback has ended, otherwise it returns false*/
+                ended:{
+                    type: Boolean,
+                    value: false,
+                    readOnly: true
                 },
 
                 /**Sets the height of the video player*/
                 height:{
-                    type:Number
+                    type: Number,
+                    value: 0
+                    // no observer needed
                 },
 
                 /**Specifies that the video will start over again, every time it is finished*/
                 loop:{
-                    type:Boolean
+                    type: Number,
+                    value: false,
+                    // no observer needed
+                },
+
+                /**Specifies the media group of the audio/video*/
+                mediaGroup:{
+                    type: String,
+                    value: '',
+                    observer: '_changedMediaGroup'
                 },
 
                 /**Specifies that the audio output of the video should be muted*/
                 muted:{
-                    type:Boolean
+                    type: Boolean,
+                    value: false
+                    // no observer needed
+                },
+
+                /**Represents the current network state of the audio/video element:
+                 <br>0 = NETWORK_EMPTY - audio/video has not yet been initialized
+                 <br>1 = NETWORK_IDLE - audio/video is active and has selected a resource, but is not using the network
+                 <br>2 = NETWORK_LOADING - browser is downloading data
+                 <br>3 = NETWORK_NO_SOURCE - no audio/video source found*/
+                networkState:{
+                    type: Number,
+                    value: 0,
+                    readOnly: true
+                },
+
+                paused:{
+                    type: Boolean,
+                    value: false,
+                    readOnly: true
+                },
+
+                /**Indicates the current playback speed of the audio/video.
+                 <br>Example values:
+                 <br>1.0 is normal speed
+                 <br>0.5 is half speed (slower)
+                 <br>2.0 is double speed (faster)
+                 <br>-1.0 is backwards, normal speed
+                 <br>-0.5 is backwards, half speed*/
+                playbackRate:{
+                    type: Number,
+                    value: 1.0,
+                    observer: '_changedPlaybackRate'
+                },
+
+                /**	Represents the played parts of the audio/video.*/
+                played:{
+                    type: Object,
+                    value: {},
+                    readOnly: true
                 },
 
                 /**Specifies an image to be shown while the video is downloading, or until the user hits the play button*/
                 poster:{
-                    type:String
+                    type: String,
+                    value: ""
+                    // no observer needed
                 },
 
-                /**Specifies if and how the author thinks the video should be loaded when the page loads
+                /**The preload property sets or returns whether the audio/video should start loading as soon as the page loads.
+                 The preload property allows the author to provide a hint to the browser about what he/she thinks will lead to the best user experience. This attribute may be ignored in some instances.
                  * 'auto'
                  * 'metadata'
                  * 'none'
-                 * */
+                 */
                 preload:{
-                    type:String
+                    type: String,
+                    value: 'auto',
+                    // no observer needed
+                },
+
+                /**Represents the ready state of the audio/video element:
+                 <br>0 = HAVE_NOTHING - no information whether or not the audio/video is ready
+                 <br>1 = HAVE_METADATA - metadata for the audio/video is ready
+                 <br>2 = HAVE_CURRENT_DATA - data for the current playback position is available, but not enough data to play next frame/millisecond
+                 <br>3 = HAVE_FUTURE_DATA - data for the current and at least the next frame is available
+                 <br>4 = HAVE_ENOUGH_DATA - enough data available to start playing*/
+                readyState:{
+                    type: Number,
+                    value: 0,
+                    readOnly: true
+                },
+
+                /**Represents the seekable parts of the audio/video.*/
+                seekable:{
+                    type: Object,
+                    value: {},
+                    readOnly: true
+                },
+
+                /**A Boolean, returns true if the user is currently seeking, otherwise it returns false*/
+                seeking:{
+                    type: Boolean,
+                    value: false,
+                    readOnly: true
+                },
+
+                /**Specifies the URL of the video file*/
+                src:{
+                    type: String,
+                    value: '',
+                    // no observer needed
+                },
+
+                /**Represents an text track.*/
+                textTracks:{
+                    type: Object,
+                    value: {},
+                    readOnly: true
+                },
+
+                /**Specifies the current volume of the audio/video. Must be a number between 0.0 and 1.0.*/
+                volume:{
+                    type: Number,
+                    value: 1,
+                    observer: '_changedVolume'
                 },
 
                 /** Sets the width of the video player */
                 width:{
-                    type:String
+                    type: Number,
+                    value: 0
+                    // no observer needed
                 }
             },
 
@@ -202,6 +407,26 @@ Example:
 
             pause: function(){
                 this.$$('video').pause();
+            },
+
+            _changedDefaultMuted:function(){
+                this.$$('video').defaultMuted = this.defaultMuted;
+            },
+
+            _changedDefaultPlaybackRate:function(){
+                this.$$('video').defaultPlaybackRate = this.defaultPlaybackRate;
+            },
+
+            _changedMediaGroup:function(){
+                this.$$('video').mediaGroup = this.mediaGroup;
+            },
+
+            _changedPlaybackRate:function(){
+                this.$$('video').playbackRate = this.playbackRate;
+            },
+
+            _changedVolume: function(){
+                this.$$('video').volume = this.volume;
             }
         });
     </script>
