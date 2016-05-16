@@ -204,17 +204,16 @@ Events:
                 if(iOS){
                     this._showCanvas();
                     if(this.autoplay){
-
                         // unsure if I need to call stop but on Desktop it auto plays and the
                         // loop function also 'plays' the video by jumping the currentTime
                         // and thus some rough playback
                         this.pause();
-                        this._lastTime = new Date();
-                        this._context = this.$$('canvas').getContext('2d');
-                        this._video = this.$$('video');
-                        this._playing = true;
-                        this._loop();
                     }
+                    this._lastTime = new Date();
+                    this._context = this.$$('canvas').getContext('2d');
+                    this._video = this.$$('video');
+                    this._playing = true;
+                    this._loop();
                 }
             },
 
