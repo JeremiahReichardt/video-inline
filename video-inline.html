@@ -41,7 +41,6 @@ Events:
     <template>
         <style>
             canvas{
-                border: 2px solid black;
                 display: none;
             }
         </style>
@@ -199,21 +198,12 @@ Events:
                 }.bind(this);
 
                 // check for iOS inline playback capability
-                var iOS = navigator.userAgent.indexOf('iPhone') >= 0;
-                iOS = true;
-                if(iOS){
+                this._canAutoPlayInline = navigator.userAgent.indexOf('iPhone') >= 0;
+
+                this._canAutoPlayInline = false;
+
+                if(!this._canAutoPlayInline){
                     this._showCanvas();
-                    if(this.autoplay){
-                        // unsure if I need to call stop but on Desktop it auto plays and the
-                        // loop function also 'plays' the video by jumping the currentTime
-                        // and thus some rough playback
-                        this.pause();
-                    }
-                    this._lastTime = new Date();
-                    this._context = this.$$('canvas').getContext('2d');
-                    this._video = this.$$('video');
-                    this._playing = true;
-                    this._loop();
                 }
             },
 
@@ -434,7 +424,7 @@ Events:
                 },
                 _video:{
                     type:Object
-                },
+                }
                 /**end canvas mode properties */
             },
 
@@ -492,10 +482,12 @@ Events:
                 this.$$('video').volume = this.volume;
             },
 
-            /**start canvas mode properties */
+            /**start canvas mode functions */
             _loop: function(){
                 var time = Date.now();
                 var elapsed = (time - this._lastTime) / 1000;
+
+                console.log(elapsed + ' ' + (1 / 30) + ' ' + this._playing);
 
                 // Render
                 if(elapsed >= (1 / 30)) { // ( 1 / framesPerSecond )
@@ -509,38 +501,39 @@ Events:
                     }
                 }
 
+                if (this._playing) {
+                    this._animationFrame = requestAnimationFrame(this._loop.bind(this));
+                } else {
+                    cancelAnimationFrame(this._animationFrame);
+                }
+
                 // If we are at the end of the video stop
                 if (this.$$('video').currentTime >= this.$$('video').duration) {
                     this._playing = false;
 
                     if (this.loop) {
                         this.$$('video').currentTime = 0;
-                    }
-
-                    if (this.loop === true) {
-                        this.$$('video').currentTime = 0;
                         this.play();
                     }
-                }
-
-                if (this._playing) {
-                    this._animationFrame = requestAnimationFrame(this._loop.bind(this));
-                } else {
-                    cancelAnimationFrame(this._animationFrame);
                 }
             },
 
             _drawFrame: function() {
-
                 this._context.drawImage(this._video, 0, 0, this.width, this.height);
             },
-            /**end canvas mode properties */
 
             _showCanvas:function() {
 //                this.$$('video').style.display = 'none';
                 this.$$('canvas').style.display = 'block';
                 this.$$('video').addEventListener('timeupdate', this._drawFrame.bind(this));
+
+                this._context = this.$$('canvas').getContext('2d');
+                this._video = this.$$('video');
+                this._lastTime = Date.now();
+                this._playing = true;
+                this._loop();
             }
+            /**end canvas mode functions */
         });
     </script>
 </dom-module>
